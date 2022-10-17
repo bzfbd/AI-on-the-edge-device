@@ -253,13 +253,13 @@ void MQTTdestroySubscribeFunction(){
 
 void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::string unit) {
     std::string version = libfive_git_version();
-    std::string deviceName = "testzaehler";
+    std::string deviceName = "AIOTED";
 
-    char *ssid = NULL, *passwd = NULL, *deviceName = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
-    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, deviceName, ip, gateway, netmask, dns);
+    char *ssid = NULL, *passwd = NULL, *hostname = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
+    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, hostname, ip, gateway, netmask, dns);
 
-    if (deviceName != NULL) {
-        deviceName = "AIOTED";
+    if (hostname != NULL) {
+        deviceName = hostname;
     }
 
     std::string fieldT = field;
@@ -301,7 +301,8 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
 
 }
 
-bool MQTThomeassistantDiscovery() {
+void MQTThomeassistantDiscovery() {
+    ESP_LOGI(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
     sendHomeAssistantDiscoveryTopic("uptime",               "clock-time-eight-outline", "s");
     sendHomeAssistantDiscoveryTopic("freeMem",              "memory",                   "B");
     sendHomeAssistantDiscoveryTopic("wifiRSSI",             "file-question-outline",    "dBm");
