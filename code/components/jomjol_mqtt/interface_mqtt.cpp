@@ -303,7 +303,7 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
 }
 
 void MQTThomeassistantDiscovery() {
-    LogFile.WriteToFile("Sending MQTT Homeassistant Discovery Topics...");
+    ESP_LOGD(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
 
     sendHomeAssistantDiscoveryTopic("uptime",               "clock-time-eight-outline", "s");
     sendHomeAssistantDiscoveryTopic("freeMem",              "memory",                   "B");
