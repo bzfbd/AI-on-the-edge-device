@@ -299,11 +299,12 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
     "}" + nl +
     "}" + nl;
     
-
+    MQTTPublish(topic, payload, true);
 }
 
 void MQTThomeassistantDiscovery() {
-    ESP_LOGI(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
+    LogFile.WriteToFile("Sending MQTT Homeassistant Discovery Topics...");
+
     sendHomeAssistantDiscoveryTopic("uptime",               "clock-time-eight-outline", "s");
     sendHomeAssistantDiscoveryTopic("freeMem",              "memory",                   "B");
     sendHomeAssistantDiscoveryTopic("wifiRSSI",             "file-question-outline",    "dBm");
