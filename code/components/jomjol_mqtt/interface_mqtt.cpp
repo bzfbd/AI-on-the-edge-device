@@ -310,6 +310,7 @@ void MQTThomeassistantDiscovery() {
     sendHomeAssistantDiscoveryTopic("wifiRSSI",             "file-question-outline",    "dBm");
     sendHomeAssistantDiscoveryTopic("CPUtemp",              "thermometer",              "°C");
     
+    // TODO replace main by all configured meters
     sendHomeAssistantDiscoveryTopic("main/value",           "gauge",                    "");
     sendHomeAssistantDiscoveryTopic("main/error",           "alert-circle-outline",     "");
     sendHomeAssistantDiscoveryTopic("main/rate",            "file-question-outline",    "");
