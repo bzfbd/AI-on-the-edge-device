@@ -4,7 +4,8 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 #include "ClassLogFile.h"
-#include "read_wlanini.h"
+#include "../jomjol_wlan/read_wlanini.h"
+#include "version.h"
 
 #define __HIDE_PASSWORD
 
@@ -251,15 +252,14 @@ void MQTTdestroySubscribeFunction(){
 }
 
 void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::string unit) {
-    // TODO replace
-    std::string version = "1.2.3";
-    std::string hostname = "testzaehler";
+    std::string version = libfive_git_version();
+    std::string deviceName = "testzaehler";
 
-    char *ssid = NULL, *passwd = NULL, *hostname = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
-    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, hostname, ip, gateway, netmask, dns);
+    char *ssid = NULL, *passwd = NULL, *deviceName = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
+    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, deviceName, ip, gateway, netmask, dns);
 
-    if (hostname != NULL) {
-        hostname = "AIOTED";
+    if (deviceName != NULL) {
+        deviceName = "AIOTED";
     }
 
     std::string fieldT = field;
@@ -272,11 +272,11 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
         fieldT.replace(fieldT.find("/"), std::string("/").size(), "_");
     }
 
-    topic = "homeassistant/sensor/" + hostname + "-" + fieldT + "/config";
+    topic = "homeassistant/sensor/" + deviceName + "-" + fieldT + "/config";
     
     payload = "{" + nl +
-        "\"~\": \"" + hostname + "\"," + nl +
-        "\"unique_id\": \"" + hostname + "-" + fieldT + "\"," + nl +
+        "\"~\": \"" + deviceName + "\"," + nl +
+        "\"unique_id\": \"" + deviceName + "-" + fieldT + "\"," + nl +
         "\"name\": \"" + field + "\"," + nl +
         "\"icon\": \"mdi:" + icon + "\"," + nl +
         "\"unit_of_meas\": \"" + unit + "\"," + nl +
@@ -290,8 +290,8 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
     
     payload +=
     "\"device\": {" + nl +
-        "\"identifiers\": [\"" + hostname + "\"]," + nl +
-        "\"name\": \"" + hostname + "\"," + nl +
+        "\"identifiers\": [\"" + deviceName + "\"]," + nl +
+        "\"name\": \"" + deviceName + "\"," + nl +
         "\"model\": \"HomeAssistant Discovery for AI on the Edge Device\"," + nl +
         "\"manufacturer\": \"AI on the Edge Device - https://github.com/jomjol/AI-on-the-edge-device\"," + nl +
         "\"sw_version\": \"" + version + "\"" + nl +
