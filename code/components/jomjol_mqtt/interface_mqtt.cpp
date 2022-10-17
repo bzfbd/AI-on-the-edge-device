@@ -5,7 +5,8 @@
 #include "mqtt_client.h"
 #include "ClassLogFile.h"
 #include "../jomjol_wlan/read_wlanini.h"
-#include "../../main/version.h"
+
+extern const char* libfive_git_version(void);
 
 #define __HIDE_PASSWORD
 
