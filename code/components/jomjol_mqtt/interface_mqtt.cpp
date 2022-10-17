@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 #include "ClassLogFile.h"
+#include "read_wlanini.h"
 
 #define __HIDE_PASSWORD
 
@@ -20,6 +21,8 @@ esp_mqtt_event_id_t esp_mmqtt_ID = MQTT_EVENT_ANY;
 
 bool mqtt_connected = false;
 esp_mqtt_client_handle_t client = NULL;
+
+void MQTThomeassistantDiscovery();
 
 bool MQTTPublish(std::string _key, std::string _content, int retained_flag){
   
@@ -151,6 +154,8 @@ bool MQTTInit(std::string _mqttURI, std::string _clientid, std::string _user, st
     }
 
     LogFile.WriteToFile("MQTT - Init successful");
+
+    MQTThomeassistantDiscovery();
     return true;
 }
 
@@ -243,4 +248,70 @@ void MQTTdestroySubscribeFunction(){
         delete subscribeFunktionMap;
         subscribeFunktionMap = NULL;
     }
+}
+
+void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::string unit) {
+    // TODO replace
+    std::string version = "1.2.3";
+    std::string hostname = "testzaehler";
+
+    char *ssid = NULL, *passwd = NULL, *hostname = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
+    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, hostname, ip, gateway, netmask, dns);
+
+    if (hostname != NULL) {
+        hostname = "AIOTED";
+    }
+
+    std::string fieldT = field;
+    std::string topic;
+    std::string payload;
+    std::string nl = "\n";
+    
+    /* Replace "/" with "_" */
+    if (fieldT.find("/") != std::string::npos) {
+        fieldT.replace(fieldT.find("/"), std::string("/").size(), "_");
+    }
+
+    topic = "homeassistant/sensor/" + hostname + "-" + fieldT + "/config";
+    
+    payload = "{" + nl +
+        "\"~\": \"" + hostname + "\"," + nl +
+        "\"unique_id\": \"" + hostname + "-" + fieldT + "\"," + nl +
+        "\"name\": \"" + field + "\"," + nl +
+        "\"icon\": \"mdi:" + icon + "\"," + nl +
+        "\"unit_of_meas\": \"" + unit + "\"," + nl +
+        "\"state_topic\": \"~/" + field + "\"," + nl;
+        
+/* Enable once MQTT is stable */
+/*    payload += 
+        "\"availability_topic\": \"~/connection\"," + nl +
+        "\"payload_available\": \"connected\"," + nl +
+        "\"payload_not_available\": \"connection lost\"," + nl; */
+    
+    payload +=
+    "\"device\": {" + nl +
+        "\"identifiers\": [\"" + hostname + "\"]," + nl +
+        "\"name\": \"" + hostname + "\"," + nl +
+        "\"model\": \"HomeAssistant Discovery for AI on the Edge Device\"," + nl +
+        "\"manufacturer\": \"AI on the Edge Device - https://github.com/jomjol/AI-on-the-edge-device\"," + nl +
+        "\"sw_version\": \"" + version + "\"" + nl +
+    "}" + nl +
+    "}" + nl;
+    
+
+}
+
+bool MQTThomeassistantDiscovery() {
+    sendHomeAssistantDiscoveryTopic("uptime",               "clock-time-eight-outline", "s");
+    sendHomeAssistantDiscoveryTopic("freeMem",              "memory",                   "B");
+    sendHomeAssistantDiscoveryTopic("wifiRSSI",             "file-question-outline",    "dBm");
+    sendHomeAssistantDiscoveryTopic("CPUtemp",              "thermometer",              "°C");
+    
+    sendHomeAssistantDiscoveryTopic("main/value",           "gauge",                    "");
+    sendHomeAssistantDiscoveryTopic("main/error",           "alert-circle-outline",     "");
+    sendHomeAssistantDiscoveryTopic("main/rate",            "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main/changeabsolut",   "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main/raw",             "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main/timestamp",       "clock-time-eight-outline", "");
+    sendHomeAssistantDiscoveryTopic("main/json",            "code-json",                "");
 }
