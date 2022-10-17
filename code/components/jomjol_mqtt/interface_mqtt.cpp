@@ -5,7 +5,7 @@
 #include "mqtt_client.h"
 #include "ClassLogFile.h"
 #include "../jomjol_wlan/read_wlanini.h"
-#include "version.h"
+#include "../version.h"
 
 #define __HIDE_PASSWORD
 
