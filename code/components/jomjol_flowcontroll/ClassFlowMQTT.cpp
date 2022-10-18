@@ -15,8 +15,6 @@ extern const char* libfive_git_version(void);
 extern const char* libfive_git_revision(void);
 extern const char* libfive_git_branch(void);
 
-void MQTThomeassistantDiscovery();
-
 #define __HIDE_PASSWORD
 
 void ClassFlowMQTT::SetInitialParameter(void)
@@ -396,14 +394,13 @@ void ClassFlowMQTT::sendHomeAssistantDiscoveryTopic(std::string group, std::stri
 }
 
 void ClassFlowMQTT::MQTThomeassistantDiscovery() {
-    LogFile.WriteToFile("Sending MQTT Homeassistant Discovery Topics...");
+    LogFile.WriteToFile("MQTT - Sending Homeassistant Discovery Topics...");
 
     sendHomeAssistantDiscoveryTopic("", "uptime",              "clock-time-eight-outline", "s");
     sendHomeAssistantDiscoveryTopic("", "freeMem",             "memory",                   "B");
     sendHomeAssistantDiscoveryTopic("", "wifiRSSI",            "file-question-outline",    "dBm");
     sendHomeAssistantDiscoveryTopic("", "CPUtemp",             "thermometer",              "°C");
     
-
     if (flowpostprocessing){
         std::vector<NumberPost*>* NUMBERS = flowpostprocessing->GetNumbers();
 
