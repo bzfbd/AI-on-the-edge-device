@@ -27,6 +27,9 @@ public:
 
     string GetMQTTMainTopic();
 
+	void MQTThomeassistantDiscovery();
+	void sendHomeAssistantDiscoveryTopic(std::string group, std::string field, std::string icon, std::string unit);
+
     bool ReadParameter(FILE* pfile, string& aktparamgraph);
     bool doFlow(string time);
     string name(){return "ClassFlowMQTT";};

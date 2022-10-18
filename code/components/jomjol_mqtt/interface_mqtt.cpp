@@ -4,11 +4,6 @@
 #include "esp_log.h"
 #include "mqtt_client.h"
 #include "ClassLogFile.h"
-#include "../jomjol_wlan/read_wlanini.h"
-
-extern const char* libfive_git_version(void);
-extern const char* libfive_git_revision(void);
-extern const char* libfive_git_branch(void);
 
 #define __HIDE_PASSWORD
 
@@ -25,8 +20,6 @@ esp_mqtt_event_id_t esp_mmqtt_ID = MQTT_EVENT_ANY;
 
 bool mqtt_connected = false;
 esp_mqtt_client_handle_t client = NULL;
-
-void MQTThomeassistantDiscovery();
 
 bool MQTTPublish(std::string _key, std::string _content, int retained_flag){
   
@@ -159,7 +152,6 @@ bool MQTTInit(std::string _mqttURI, std::string _clientid, std::string _user, st
 
     LogFile.WriteToFile("MQTT - Init successful");
 
-    MQTThomeassistantDiscovery();
     return true;
 }
 
@@ -252,82 +244,4 @@ void MQTTdestroySubscribeFunction(){
         delete subscribeFunktionMap;
         subscribeFunktionMap = NULL;
     }
-}
-
-void sendHomeAssistantDiscoveryTopic(std::string group, std::string field, std::string icon, std::string unit) {
-    std::string version = std::string(libfive_git_version());
-
-    if (version == "") {
-        version = std::string(libfive_git_branch()) + " (" + std::string(libfive_git_revision()) + ")";
-    }
-    std::string deviceName = "AIOTED";
-
-    char *ssid = NULL, *passwd = NULL, *hostname = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
-    LoadWlanFromFile("/sdcard/wlan.ini", ssid, passwd, hostname, ip, gateway, netmask, dns);
-
-    if (hostname != NULL) {
-        deviceName = hostname;
-    }
-
-    std::string topic;
-    std::string topicT;
-    std::string payload;
-    std::string nl = "\n";
-
-    if (group != "") {
-        topic = group + "/" + field;
-        topicT = group + "_" + field;
-    }
-    else {
-        topic =  field;
-        topicT = field;
-    }
-    
-
-
-    topic = "homeassistant/sensor/" + deviceName + "-" + topicT + "/config";
-    
-    payload = "{" + nl +
-        "\"~\": \"" + deviceName + "\"," + nl +
-        "\"unique_id\": \"" + deviceName + "-" +topicT + "\"," + nl +
-        "\"name\": \"" + topic + "\"," + nl +
-        "\"icon\": \"mdi:" + icon + "\"," + nl +
-        "\"unit_of_meas\": \"" + unit + "\"," + nl +
-        "\"state_topic\": \"~/" + topic + "\"," + nl;
-        
-/* Enable once MQTT is stable */
-/*    payload += 
-        "\"availability_topic\": \"~/connection\"," + nl +
-        "\"payload_available\": \"connected\"," + nl +
-        "\"payload_not_available\": \"connection lost\"," + nl; */
-    
-    payload +=
-    "\"device\": {" + nl +
-        "\"identifiers\": [\"" + deviceName + "\"]," + nl +
-        "\"name\": \"" + deviceName + "\"," + nl +
-        "\"model\": \"HomeAssistant Discovery for AI on the Edge Device\"," + nl +
-        "\"manufacturer\": \"AI on the Edge Device - https://github.com/jomjol/AI-on-the-edge-device\"," + nl +
-        "\"sw_version\": \"" + version + "\"" + nl +
-    "}" + nl +
-    "}" + nl;
-    
-    MQTTPublish(topic, payload, true);
-}
-
-void MQTThomeassistantDiscovery() {
-    ESP_LOGD(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
-
-    sendHomeAssistantDiscoveryTopic("", "uptime",              "clock-time-eight-outline", "s");
-    sendHomeAssistantDiscoveryTopic("", "freeMem",             "memory",                   "B");
-    sendHomeAssistantDiscoveryTopic("", "wifiRSSI",            "file-question-outline",    "dBm");
-    sendHomeAssistantDiscoveryTopic("", "CPUtemp",             "thermometer",              "°C");
-    
-    // TODO replace main by all configured meters
-    sendHomeAssistantDiscoveryTopic("main", "value",           "gauge",                    "");
-    sendHomeAssistantDiscoveryTopic("main", "error",           "alert-circle-outline",     "");
-    sendHomeAssistantDiscoveryTopic("main", "rate",            "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main", "changeabsolut",   "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main", "raw",             "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main", "timestamp",       "clock-time-eight-outline", "");
-    sendHomeAssistantDiscoveryTopic("main", "json",            "code-json",                "");
 }
