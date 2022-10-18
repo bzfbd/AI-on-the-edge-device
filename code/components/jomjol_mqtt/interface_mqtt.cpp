@@ -252,7 +252,7 @@ void MQTTdestroySubscribeFunction(){
     }
 }
 
-void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::string unit) {
+void sendHomeAssistantDiscoveryTopic(std::string field, std::string subfield, std::string icon, std::string unit) {
     std::string version = libfive_git_version();
     std::string deviceName = "AIOTED";
 
@@ -263,25 +263,19 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
         deviceName = hostname;
     }
 
-    std::string fieldT = field;
     std::string topic;
     std::string payload;
     std::string nl = "\n";
-    
-    /* Replace "/" with "_" */
-    if (fieldT.find("/") != std::string::npos) {
-        fieldT.replace(fieldT.find("/"), std::string("/").size(), "_");
-    }
 
-    topic = "homeassistant/sensor/" + deviceName + "-" + fieldT + "/config";
+    topic = "homeassistant/sensor/" + deviceName + "-" + field + "_" + subfield + "/config";
     
     payload = "{" + nl +
         "\"~\": \"" + deviceName + "\"," + nl +
-        "\"unique_id\": \"" + deviceName + "-" + fieldT + "\"," + nl +
-        "\"name\": \"" + field + "\"," + nl +
+        "\"unique_id\": \"" + deviceName + "-" + field + "_" + subfield + "\"," + nl +
+        "\"name\": \"" + field + "_" + subfield + "\"," + nl +
         "\"icon\": \"mdi:" + icon + "\"," + nl +
         "\"unit_of_meas\": \"" + unit + "\"," + nl +
-        "\"state_topic\": \"~/" + field + "\"," + nl;
+        "\"state_topic\": \"~/" + field + "/" + subfield + "\"," + nl;
         
 /* Enable once MQTT is stable */
 /*    payload += 
@@ -305,17 +299,17 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string icon, std::s
 void MQTThomeassistantDiscovery() {
     ESP_LOGD(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
 
-    sendHomeAssistantDiscoveryTopic("uptime",               "clock-time-eight-outline", "s");
-    sendHomeAssistantDiscoveryTopic("freeMem",              "memory",                   "B");
-    sendHomeAssistantDiscoveryTopic("wifiRSSI",             "file-question-outline",    "dBm");
-    sendHomeAssistantDiscoveryTopic("CPUtemp",              "thermometer",              "°C");
+    sendHomeAssistantDiscoveryTopic("uptime",   "",            "clock-time-eight-outline", "s");
+    sendHomeAssistantDiscoveryTopic("freeMem",  "",            "memory",                   "B");
+    sendHomeAssistantDiscoveryTopic("wifiRSSI", "",            "file-question-outline",    "dBm");
+    sendHomeAssistantDiscoveryTopic("CPUtemp",  "",            "thermometer",              "°C");
     
     // TODO replace main by all configured meters
-    sendHomeAssistantDiscoveryTopic("main/value",           "gauge",                    "");
-    sendHomeAssistantDiscoveryTopic("main/error",           "alert-circle-outline",     "");
-    sendHomeAssistantDiscoveryTopic("main/rate",            "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main/changeabsolut",   "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main/raw",             "file-question-outline",    "");
-    sendHomeAssistantDiscoveryTopic("main/timestamp",       "clock-time-eight-outline", "");
-    sendHomeAssistantDiscoveryTopic("main/json",            "code-json",                "");
+    sendHomeAssistantDiscoveryTopic("main", "value",           "gauge",                    "");
+    sendHomeAssistantDiscoveryTopic("main", "error",           "alert-circle-outline",     "");
+    sendHomeAssistantDiscoveryTopic("main", "rate",            "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main", "changeabsolut",   "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main", "raw",             "file-question-outline",    "");
+    sendHomeAssistantDiscoveryTopic("main", "timestamp",       "clock-time-eight-outline", "");
+    sendHomeAssistantDiscoveryTopic("main", "json",            "code-json",                "");
 }
