@@ -7,6 +7,8 @@
 #include "../jomjol_wlan/read_wlanini.h"
 
 extern const char* libfive_git_version(void);
+extern const char* libfive_git_revision(void);
+extern const char* libfive_git_branch(void);
 
 #define __HIDE_PASSWORD
 
@@ -253,7 +255,11 @@ void MQTTdestroySubscribeFunction(){
 }
 
 void sendHomeAssistantDiscoveryTopic(std::string field, std::string subfield, std::string icon, std::string unit) {
-    std::string version = libfive_git_version();
+    std::string version = std::string(libfive_git_version());
+
+    if (version == "") {
+        version = std::string(libfive_git_branch()) + " (" + std::string(libfive_git_revision()) + ")";
+    }
     std::string deviceName = "AIOTED";
 
     char *ssid = NULL, *passwd = NULL, *hostname = NULL, *ip = NULL, *gateway = NULL, *netmask = NULL, *dns = NULL;
