@@ -254,7 +254,7 @@ void MQTTdestroySubscribeFunction(){
     }
 }
 
-void sendHomeAssistantDiscoveryTopic(std::string field, std::string subfield, std::string icon, std::string unit) {
+void sendHomeAssistantDiscoveryTopic(std::string group, std::string field, std::string icon, std::string unit) {
     std::string version = std::string(libfive_git_version());
 
     if (version == "") {
@@ -270,18 +270,30 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string subfield, st
     }
 
     std::string topic;
+    std::string topicT;
     std::string payload;
     std::string nl = "\n";
 
-    topic = "homeassistant/sensor/" + deviceName + "-" + field + "_" + subfield + "/config";
+    if (group != "") {
+        topic = group + "/" + field;
+        topicT = group + "_" + field;
+    }
+    else {
+        topic =  field;
+        topicT = field;
+    }
+    
+
+
+    topic = "homeassistant/sensor/" + deviceName + "-" + topicT + "/config";
     
     payload = "{" + nl +
         "\"~\": \"" + deviceName + "\"," + nl +
-        "\"unique_id\": \"" + deviceName + "-" + field + "_" + subfield + "\"," + nl +
-        "\"name\": \"" + field + "_" + subfield + "\"," + nl +
+        "\"unique_id\": \"" + deviceName + "-" +topicT + "\"," + nl +
+        "\"name\": \"" + topic + "\"," + nl +
         "\"icon\": \"mdi:" + icon + "\"," + nl +
         "\"unit_of_meas\": \"" + unit + "\"," + nl +
-        "\"state_topic\": \"~/" + field + "/" + subfield + "\"," + nl;
+        "\"state_topic\": \"~/" + topic + "\"," + nl;
         
 /* Enable once MQTT is stable */
 /*    payload += 
@@ -305,10 +317,10 @@ void sendHomeAssistantDiscoveryTopic(std::string field, std::string subfield, st
 void MQTThomeassistantDiscovery() {
     ESP_LOGD(TAG_INTERFACEMQTT, "Sending MQTT Homeassistant Discovery Topics...");
 
-    sendHomeAssistantDiscoveryTopic("uptime",   "",            "clock-time-eight-outline", "s");
-    sendHomeAssistantDiscoveryTopic("freeMem",  "",            "memory",                   "B");
-    sendHomeAssistantDiscoveryTopic("wifiRSSI", "",            "file-question-outline",    "dBm");
-    sendHomeAssistantDiscoveryTopic("CPUtemp",  "",            "thermometer",              "°C");
+    sendHomeAssistantDiscoveryTopic("", "uptime",              "clock-time-eight-outline", "s");
+    sendHomeAssistantDiscoveryTopic("", "freeMem",             "memory",                   "B");
+    sendHomeAssistantDiscoveryTopic("", "wifiRSSI",            "file-question-outline",    "dBm");
+    sendHomeAssistantDiscoveryTopic("", "CPUtemp",             "thermometer",              "°C");
     
     // TODO replace main by all configured meters
     sendHomeAssistantDiscoveryTopic("main", "value",           "gauge",                    "");
