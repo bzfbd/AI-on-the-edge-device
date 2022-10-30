@@ -87,9 +87,6 @@ void sendHomeAssistantDiscoveryTopic(std::string maintopic, std::string group, s
 
     if (deviceClass != "") {
         payload += "\"device_class\": \"" + deviceClass + "\"," + nl;
-     /*   if (deviceClass == "problem") {
-            payload += "\"value_template\": \"{{ 'OFF' if 'no error' in value else 'ON'}}\"," + nl;
-        }*/
     }
 
     if (stateClass != "") {
@@ -123,7 +120,7 @@ void MQTThomeassistantDiscovery(std::string maintopic) {
     
     LogFile.WriteToFile(ESP_LOG_INFO, "MQTT - Sending Homeassistant Discovery Topics (Meter Type: " + meterType + ", Value Unit: " + valueUnit + " , Rate Unit: " + rateUnit + ")...");
 
-    //                              Maintopic | Group | Field     | User Friendly Name | Icon                      | Unit | Device Class     | State Class   | Entity Category
+    //                              Maintopic  | Group | Field     | User Friendly Name | Icon                      | Unit | Device Class     | State Class  | Entity Category
     sendHomeAssistantDiscoveryTopic(maintopic, "",     "uptime",   "Uptime",            "clock-time-eight-outline", "s",   "",                "",            "diagnostic");
     sendHomeAssistantDiscoveryTopic(maintopic, "",     "MAC",      "MAC Address",       "network-outline",          "",    "",                "",            "diagnostic");
     sendHomeAssistantDiscoveryTopic(maintopic, "",     "hostname", "Hostname",          "network-outline",          "",    "",                "",            "diagnostic");
@@ -133,7 +130,7 @@ void MQTThomeassistantDiscovery(std::string maintopic) {
     // The IP config topic not published as it is already provided through the configuration_url    -   sendHomeAssistantDiscoveryTopic(maintopic, "",     "IP",       "IP",                "network-outline",          "",    "",                "");
 
     for (int i = 0; i < (*NUMBERS).size(); ++i) {
-    //                                  Maintopic | Group             | Field          | User Friendly Name           | Icon                     | Unit      | Device Class | State Class         | Entity Category
+    //                                  Maintopic | Group               | Field          | User Friendly Name          | Icon                     | Unit     | Device Class  | State Class       | Entity Category
         sendHomeAssistantDiscoveryTopic(maintopic, (*NUMBERS)[i]->name, "value",         "Value",                      "gauge",                    valueUnit, meterType,     "total_increasing", "");
         sendHomeAssistantDiscoveryTopic(maintopic, (*NUMBERS)[i]->name, "raw",           "Raw Value",                  "raw",                      valueUnit, "",            "total_increasing", "diagnostic");
         sendHomeAssistantDiscoveryTopic(maintopic, (*NUMBERS)[i]->name, "error",         "Error",                      "alert-circle-outline",     "",        "",            "",                 "diagnostic");
