@@ -365,6 +365,11 @@ bool ClassFlowMQTT::doFlow(string zwtime)
                 json += "\",\"rate\":\"\"";
             json += ",\"timestamp\":\""+resulttimestamp+"\"}";
 
+            if (resultchangabs.length() > 0)
+                json += "\",\"changeabsolut\":"+resultchangabs;
+            else
+                json += "\",\"changeabsolut\":\"\"";
+
             MQTTPublish(namenumber + "json", json, SetRetainFlag);
         }
     }
