@@ -359,11 +359,14 @@ bool ClassFlowMQTT::doFlow(string zwtime)
 
             json += ",\"raw\":\""+resultraw;
             json += "\",\"error\":\""+resulterror;
+
             if (resultrate.length() > 0)
                 json += "\",\"rate\":"+resultrate;
             else
                 json += "\",\"rate\":\"\"";
-        
+
+            json += ",\"timestamp\":\""+resulttimestamp+"\"}";
+
             if (resultchangabs.length() > 0)
                 json += "\",\"changeabsolut\":"+resultchangabs;
             else
